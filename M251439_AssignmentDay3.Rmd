@@ -1,0 +1,111 @@
+---
+title: "Assignment Day3"
+author: "Teru Fujioka"
+date: "2025-12-19"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(lme4)
+library(ggplot2)
+library(performance)
+
+data("sleepstudy")
+```
+
+## 1. Introduction: Dataset Description
+
+- **Dataset**: `sleepstudy` (from R package **lme4**)  
+- **Source**: Belenky et al. (2003), *Journal of Sleep Research*  
+- **Objective**:  Investigate the effect of sleep deprivation on reaction time.
+- **Variables**:
+  - **Reaction**: Average reaction time (ms) *(Outcome)*
+  - **Days**: Days of sleep deprivation (0–9) *(Level 1 Predictor)*
+  - **Subject**: Participant ID *(Level 2 grouping variable)*
+
+
+## 2. Reporting Items Checklist (Overview)
+
+I address the 6 key reporting items identified in last week assignment:
+
+- **Software**: R package **lme4**
+- **Sample Saizes**: Level 1 (*$N=180$*), Level 2 (*$N=18$*).
+- **Estimation**: **REML** (Restricted Maximum Likelihood).
+- **Centering**: `Days` is Uncentered (0 = baseline).
+- **Model Specification**: Fixed/Random effects defined (See Slide 4).
+- **Model Fit**: AIC & Deviance Test (See Slide 7).
+
+## 3. Visualization (Spaghetti Plot)
+
+```{r echo=FALSE}
+library(ggplot2)
+
+ggplot(sleepstudy, aes(x = Days + 1, y = Reaction, group = Subject, colour = Subject)) +
+  geom_line(alpha = 0.7) +
+  geom_point(size = 1) +
+  theme_minimal() +
+  labs(title = "Spaghetti Plot of Reaction Time over Days",
+       y = "Reaction Time (ms)", 
+       x = "Days of Sleep Deprivation",
+       color = "Subject ID") +
+  scale_x_continuous(breaks = seq(1, 10, 1)) +
+  guides(color = "none") +
+  scale_color_viridis_d(option = "mako", begin = 0, end = 0.8)
+```
+
+## 4. Reporting Item 5: Model Specification
+I specified two models to distinguish Fixed and Random effects:
+
+- **Model 1: Random Intercept Model**
+  - **Fixed**: Intercept, Days
+  - **Random**: Intercept (per Subject)
+- **Model 2: Random Slope Model**
+  - **Fixed**: Intercept, Days
+  - **Random**: Intercept + **Slope (Days)** (per Subject)
+
+## 5. Result: Random Intercept Model
+- **Input**
+```{r, echo=TRUE, results='hide'}
+model_intercept <- lmer(
+  Reaction ~ 1 + Days + (1 | Subject), 
+  data = sleepstudy)
+summary(model_intercept)
+```
+- **Ourput**
+```{r, echo=FALSE, out.width="75%", fig.show='hold', fig.align='center'}
+knitr::include_graphics("result1.png")
+```
+
+## 6. Result: Random Slope Model
+- **Input**
+```{r, echo=TRUE, results='hide'}
+model_slope <- lmer(
+  Reaction ~ 1 + Days + (1 + Days | Subject), 
+  data = sleepstudy)
+summary(model_slope)
+```
+- **Output**
+```{r, echo=FALSE, out.width="75%", fig.show='hold', fig.align='center'}
+knitr::include_graphics("result2.png")
+```
+
+## 7. Reporting Item 6: Model Fit and Comparison
+Comparison using Likelihood Ratio Test (LRT) and AIC:
+```{r, echo=TRUE, results='hide'}
+anova(model_intercept, model_slope, refit = FALSE)
+```
+```{r, echo=FALSE, out.width="95%", fig.show='hold', fig.align='center'}
+knitr::include_graphics("result3.png")
+```
+
+## 8. Conclusion
+- Summary:
+  - Sleep deprivation leads to slower reaction times (Fixed Effect).
+  - The rate of decline varies significantly between individuals (Random Slope).
+- Final Model: Random Slope Model is selected.
+
+## 9. Reproducibility
+- The dataset and code are available at my GitHub repository:
+- [URL]
