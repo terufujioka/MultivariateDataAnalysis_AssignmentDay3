@@ -108,4 +108,4 @@ knitr::include_graphics("result3.png")
 
 ## 9. Reproducibility
 - The dataset and code are available at my GitHub repository:
-- [URL]
+  - https://github.com/terufujioka/MultivariateDataAnalysis_AssignmentDay3
